@@ -1,0 +1,27 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+
+iris = load_iris()
+iris_df = pd.DataFrame(data=np.c_[iris['data'], iris['target']], columns=iris['feature_names'] + ['target'])
+
+print(iris_df.info())
+print(iris_df.describe())
+
+# Pairplot to visualize relationships between features
+sns.pairplot(iris_df, hue='target')
+plt.show()
+
+# Boxplot to show distribution of features for each target class
+plt.figure(figsize=(12, 8))
+for i, feature in enumerate(iris['feature_names']):
+    plt.subplot(2, 2, i + 1)
+    sns.boxplot(x='target', y=feature, data=iris_df)
+plt.show()
+
+# Correlation heatmap
+plt.figure(figsize=(8, 6))
+sns.heatmap(iris_df.corr(), annot=True, cmap='coolwarm', linewidths=.5)
+plt.show()
