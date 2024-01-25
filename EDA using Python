@@ -25,3 +25,5 @@ plt.show()
 plt.figure(figsize=(8, 6))
 sns.heatmap(iris_df.corr(), annot=True, cmap='coolwarm', linewidths=.5)
 plt.show()
+
+iris_df.to_csv('iris_df.csv', sep=',', index=False)
