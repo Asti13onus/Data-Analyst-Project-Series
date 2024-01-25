@@ -1,0 +1,58 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+
+weather_df = pd.read_csv('weather.csv')
+
+
+print(weather_df.isnull().sum())
+
+
+for column in weather_df.columns:
+    if weather_df[column].dtype != 'object':
+        weather_df[column].fillna(weather_df[column].mean(), inplace=True)
+    else:
+        
+        weather_df[column].fillna(weather_df[column].mode()[0], inplace=True)
+
+
+numeric_columns = weather_df.select_dtypes(include=np.number).columns
+for column in numeric_columns:
+    Q1 = weather_df[column].quantile(0.25)
+    Q3 = weather_df[column].quantile(0.75)
+    IQR = Q3 - Q1
+    weather_df = weather_df[~((weather_df[column] < (Q1 - 1.5 * IQR)) | (weather_df[column] > (Q3 + 1.5 * IQR)))]
+
+print(weather_df.columns)
+
+#Analysis for 9am
+X = weather_df[['Humidity9am', 'WindGustSpeed']]
+y = weather_df['Temp9am']
+
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+
+y_pred = model.predict(X_test)
+
+
+print('Mean Squared Error:', mean_squared_error(y_test, y_pred))
+print('R-squared:', r2_score(y_test, y_pred))
+
+
+correlation_matrix = weather_df[numeric_columns].corr()
+
+
+plt.figure(figsize=(10, 8))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', linewidths=.5)
+plt.title('Correlation Matrix')
+plt.show()
