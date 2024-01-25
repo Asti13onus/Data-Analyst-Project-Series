@@ -28,3 +28,5 @@ for column in numeric_columns:
 # Display boxplots after handling outliers
 sns.boxplot(data=weather_df)
 plt.show()
+
+weather_df.to_csv("weather_df.csv", sep=',', index=False)
